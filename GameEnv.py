@@ -46,7 +46,8 @@ class Game2048:
         elif action == "d":
             dirct = 3
         else:
-            print(illegal)
+            dirct = 0
+            print("wrong")
         tmp = copy.deepcopy(self.matrix)
         cur_score = self.move(self.matrix, dirct)
         if tmp != self.matrix:
@@ -58,9 +59,9 @@ class Game2048:
             if self.score > self.max_score:
                 self.max_score = self.score
                 self.max_matrix = self.matrix
-            return tmp, cur_score, True, self.matrix
+            return self.matrix,cur_score, True,
         else:
-            return tmp, -1000, False, self.matrix
+            return self.matrix, -1000, False
 
     def display(self, mtr=None, n=4):
         def T(a):
