@@ -1,10 +1,11 @@
 #-*-coding:utf-8-*-
 from GameEnv import Game2048
 from DQN import DQN
+import random
 gameEnv = Game2048()
 RL = DQN()
 observation = gameEnv.matrix
-for episode in range(1000):
+for episode in range(10000):
     # 初始化环境
     gameEnv.reset()
 
@@ -28,3 +29,18 @@ for episode in range(1000):
         # 如果终止, 就跳出循环
         if done:
             break
+
+    if episode % 100 == 0:
+        gameEnv.reset()
+        flag = False
+        while True:
+            if flag:
+                action = random.choice(["a","w","d","s"])
+            else:
+                action = RL.choose_action_max([observation])
+            observation_, reward, done = gameEnv.step(action)
+            flag = True if observation_ == observation else False
+            observation = observation_
+            if done:
+                print("this_score_____________________:",gameEnv.score)
+                break

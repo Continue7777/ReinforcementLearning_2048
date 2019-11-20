@@ -8,15 +8,15 @@ from GameEnv import Game2048
 
 
 class DQN:
-    def __init__(self,embedding_size=50,learning_rate=0.01,batch_size=1000): #初始化
-        self.embedding_size = embedding_size
+    def __init__(self,learning_rate=0.01,batch_size=1000): #初始化
         self.learning_rate = learning_rate
         self.batch_size = batch_size
-        self.sigema = 1
+        self.sigema = 0.1
         self.step = 0
         self.explore_alpha = 0.9 ** (self.step / 1000)
 
         self.actions_index_dicts = {"a":0,"s":1,"w":2,"d":3}
+        self.actions_index_dicts_reverse = {0:"a",1:"s",2:"w",3:"d"}
 
         self.sess = tf.Session()
         self.build_network()
@@ -64,6 +64,10 @@ class DQN:
     def choose_action(self,status): #通过训练好的网络，根据状态获取动作
         prob_all = self.sess.run(self.predictions, feed_dict={self.matrixInput:np.array(status)})[0]
         return self._greedy_e(list(self.actions_index_dicts.keys()),prob_all)
+
+    def choose_action_max(self,status):
+        max_action = self.sess.run(self.predictionsMaxQAction, feed_dict={self.matrixInput: np.array(status)})[0]
+        return self.actions_index_dicts_reverse[max_action]
 
 
     def get_max_availble_action_value(self,status):
