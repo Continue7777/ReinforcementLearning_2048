@@ -5,11 +5,10 @@ import random
 import copy
 gameEnv = Game2048()
 RL = DQN()
-observation = gameEnv.matrix
 for episode in range(10000):
     # 初始化环境
     gameEnv.reset()
-
+    observation = copy.deepcopy(gameEnv.matrix)
     while True:
         # DQN 根据观测值选择行为
         action = RL.choose_action([observation])

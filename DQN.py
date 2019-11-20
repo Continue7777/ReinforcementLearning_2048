@@ -17,6 +17,7 @@ class DQN:
 
         self.actions_index_dicts = {"a":0,"s":1,"w":2,"d":3}
         self.actions_index_dicts_reverse = {0:"a",1:"s",2:"w",3:"d"}
+        self.actions_index_keys = ["a","s","w","d"]
 
         self.sess = tf.Session()
         self.build_network()
@@ -63,7 +64,7 @@ class DQN:
 
     def choose_action(self,status): #通过训练好的网络，根据状态获取动作
         prob_all = self.sess.run(self.predictions, feed_dict={self.matrixInput:np.array(status)})[0]
-        return self._greedy_e(list(self.actions_index_dicts.keys()),prob_all)
+        return self._greedy_e(self.actions_index_keys,prob_all)
 
     def choose_action_max(self,status):
         max_action = self.sess.run(self.predictionsMaxQAction, feed_dict={self.matrixInput: np.array(status)})[0]
