@@ -136,7 +136,7 @@ class Game2048:
 
         elif dirct == 3:  # right
             for i in range(self.grid_n):
-                for j in range(self.grid_n, 0, -1):
+                for j in range(self.grid_n-1, 0, -1):
                     for k in range(j):
                         if mtr[i][k + 1] == 0:
                             mtr[i][k + 1] = mtr[i][k]
