@@ -115,7 +115,7 @@ class Game2048:
                         elif mtr[k + 1][j] == mtr[k][j] and (self.grid_n * (k + 1) + j) not in visit and (self.grid_n * k + j) not in visit:
                             mtr[k + 1][j] *= 2
                             mtr[k][j] = 0
-                            score = mtr[k + 1][j]
+                            score += mtr[k + 1][j]
                             visit.append(self.grid_n * (k) + j)
                             visit.append(self.grid_n * (k + 1) + j)
 
