@@ -13,14 +13,14 @@ import copy
 
 
 class Game2048:
-    def __init__(self):
+    def __init__(self,grid_n=4):
         self.score = 0
         self.step_num = 0
         self.episode = 0
         self.max_score = 0
         self.max_matrix = [[]]
 
-        self.grid_n = 4
+        self.grid_n = grid_n
         self.reset()
 
     def reset(self):
