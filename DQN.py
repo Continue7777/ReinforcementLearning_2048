@@ -116,6 +116,7 @@ class DQN:
         return np.array(random.sample(self.memory, self.batch_size))
 
     def experience_store(self,status,action,reward,done,next_status):
-       self.memory.append([status,action,reward,done,next_status])
-       self.file.write(str(status) + "\t" + action + "\t" + str(reward) + "\t" + str(done) + "\t" + str(
-           next_status) + "\n")
+        if status != next_status:
+           self.memory.append([status,action,reward,done,next_status])
+           self.file.write(str(status) + "\t" + action + "\t" + str(reward) + "\t" + str(done) + "\t" + str(
+               next_status) + "\n")
