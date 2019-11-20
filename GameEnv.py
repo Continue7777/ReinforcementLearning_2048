@@ -63,14 +63,14 @@ class Game2048:
         else:
             return copy.deepcopy(self.matrix), cur_score, False
 
-    def display(self, mtr=None, n=4):
+    def display(self, mtr=None):
         def T(a):
             return str(a) + "\t" if a else '-' + "\t"
 
         if mtr is None:
             mtr = self.matrix
-        for i in range(n):
-            for j in range(n):
+        for i in range(self.grid_n):
+            for j in range(self.grid_n):
                 print(T(mtr[i][j]), end=" ")
             print("\n")
 
