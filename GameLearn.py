@@ -2,6 +2,7 @@
 from GameEnv import Game2048
 from DQN import DQN
 import random
+import copy
 gameEnv = Game2048()
 RL = DQN()
 observation = gameEnv.matrix
@@ -40,7 +41,7 @@ for episode in range(10000):
                 action = RL.choose_action_max([observation])
             observation_, reward, done = gameEnv.step(action)
             flag = True if observation_ == observation else False
-            observation = observation_
+            observation = copy.deepcopy(observation_)
             if done:
                 print("this_score_____________________:",gameEnv.score)
                 break
