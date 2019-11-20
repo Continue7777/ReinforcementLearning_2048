@@ -11,7 +11,7 @@ class DQN:
     def __init__(self,learning_rate=0.01,batch_size=1000): #初始化
         self.learning_rate = learning_rate
         self.batch_size = batch_size
-        self.sigema = 0.1
+        self.sigema = 0.05
         self.step = 0
         self.explore_alpha = 0.9 ** (self.step / 1000)
 
