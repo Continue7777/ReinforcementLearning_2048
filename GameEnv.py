@@ -20,13 +20,13 @@ class Game2048:
         self.max_score = 0
         self.max_matrix = [[]]
 
-        self.n = 4
+        self.grid_n = 4
         self.reset()
 
     def reset(self):
-        mtr = [[0 for i in range(4)] for j in range(4)]  # 小小蛋疼..
-        ran_pos = random.sample(range(16), 2)
-        mtr[int(ran_pos[0] / 4)][int(ran_pos[0] % 4)] = mtr[int(ran_pos[1] / 4)][int(ran_pos[1] % 4)] = 2
+        mtr = [[0 for i in range(self.grid_n)] for j in range(self.grid_n)]  # 小小蛋疼..
+        ran_pos = random.sample(range(self.grid_n**2), 2)
+        mtr[int(ran_pos[0] / self.grid_n)][int(ran_pos[0] % self.grid_n)] = mtr[int(ran_pos[1] / self.grid_n)][int(ran_pos[1] % self.grid_n)] = 2
 
         self.matrix = mtr
         self.step_num = 0
@@ -75,14 +75,14 @@ class Game2048:
             print("\n")
 
     def is_over(self, mtr):
-        for i in range(4):
+        for i in range(self.grid_n):
             if 0 in mtr[i]:
                 return False
-        for i in range(4):
-            for j in range(4):
-                if i < 3 and mtr[i][j] == mtr[i + 1][j]:
+        for i in range(self.grid_n):
+            for j in range(self.grid_n):
+                if i < self.grid_n-1 and mtr[i][j] == mtr[i + 1][j]:
                     return False
-                if j < 3 and mtr[i][j] == mtr[i][j + 1]:
+                if j < self.grid_n-1 and mtr[i][j] == mtr[i][j + 1]:
                     return False
         return True
 
@@ -90,63 +90,63 @@ class Game2048:
         score = 0
         visit = []
         if dirct == 0:  # left
-            for i in range(4):
-                for j in range(1, 4):
+            for i in range(self.grid_n):
+                for j in range(1, self.grid_n):
                     for k in range(j, 0, -1):
                         if mtr[i][k - 1] == 0:
                             mtr[i][k - 1] = mtr[i][k]
                             mtr[i][k] = 0
-                        elif mtr[i][k - 1] == mtr[i][k] and 4 * i + k - 1 not in visit and 4 * i + k not in visit:
+                        elif mtr[i][k - 1] == mtr[i][k] and self.grid_n * i + k - 1 not in visit and self.grid_n * i + k not in visit:
                             mtr[i][k - 1] *= 2
                             mtr[i][k] = 0
                             score += mtr[i][k - 1]
-                            visit.append(4 * i + k)
-                            visit.append(4 * i + k - 1)
+                            visit.append(self.grid_n * i + k)
+                            visit.append(self.grid_n * i + k - 1)
                             # for i in range(4):
                             #    for j in range(3):
 
         elif dirct == 1:  # down
-            for j in range(4):
-                for i in range(3, 0, -1):
+            for j in range(self.grid_n):
+                for i in range(self.grid_n-1, 0, -1):
                     for k in range(0, i):
                         if mtr[k + 1][j] == 0:
                             mtr[k + 1][j] = mtr[k][j]
                             mtr[k][j] = 0
-                        elif mtr[k + 1][j] == mtr[k][j] and (4 * (k + 1) + j) not in visit and (4 * k + j) not in visit:
+                        elif mtr[k + 1][j] == mtr[k][j] and (self.grid_n * (k + 1) + j) not in visit and (self.grid_n * k + j) not in visit:
                             mtr[k + 1][j] *= 2
                             mtr[k][j] = 0
                             score = mtr[k + 1][j]
-                            visit.append(4 * (k) + j)
-                            visit.append(4 * (k + 1) + j)
+                            visit.append(self.grid_n * (k) + j)
+                            visit.append(self.grid_n * (k + 1) + j)
 
 
         elif dirct == 2:  # up
-            for j in range(4):
-                for i in range(1, 4):
+            for j in range(self.grid_n):
+                for i in range(1, self.grid_n):
                     for k in range(i, 0, -1):
                         if mtr[k - 1][j] == 0:
                             mtr[k - 1][j] = mtr[k][j]
                             mtr[k][j] = 0
-                        elif mtr[k - 1][j] == mtr[k][j] and (4 * (k - 1) + j) not in visit and (4 * k + j) not in visit:
+                        elif mtr[k - 1][j] == mtr[k][j] and (self.grid_n * (k - 1) + j) not in visit and (self.grid_n * k + j) not in visit:
                             mtr[k - 1][j] *= 2
                             mtr[k][j] = 0
                             score += mtr[k - 1][j]
-                            visit.append(4 * (k) + j)
-                            visit.append(4 * (k - 1) + j)
+                            visit.append(self.grid_n * (k) + j)
+                            visit.append(self.grid_n * (k - 1) + j)
 
         elif dirct == 3:  # right
-            for i in range(4):
-                for j in range(3, 0, -1):
+            for i in range(self.grid_n):
+                for j in range(self.grid_n, 0, -1):
                     for k in range(j):
                         if mtr[i][k + 1] == 0:
                             mtr[i][k + 1] = mtr[i][k]
                             mtr[i][k] = 0
-                        elif mtr[i][k] == mtr[i][k + 1] and 4 * i + k + 1 not in visit and 4 * i + k not in visit:
+                        elif mtr[i][k] == mtr[i][k + 1] and self.grid_n * i + k + 1 not in visit and self.grid_n * i + k not in visit:
                             mtr[i][k + 1] *= 2
                             mtr[i][k] = 0
                             score += mtr[i][k + 1]
-                            visit.append(4 * i + k + 1)
-                            visit.append(4 * i + k)
+                            visit.append(self.grid_n * i + k + 1)
+                            visit.append(self.grid_n * i + k)
 
         return score
 
@@ -154,14 +154,14 @@ class Game2048:
         ran_pos = []
         ran_num = [2, 4]
 
-        for i in range(4):
-            for j in range(4):
+        for i in range(self.grid_n):
+            for j in range(self.grid_n):
                 if mtr[i][j] == 0:
-                    ran_pos.append(4 * i + j)
+                    ran_pos.append(self.grid_n * i + j)
         if len(ran_pos) > 0:
             k = random.choice(ran_pos)
             n = random.choice(ran_num)
-            mtr[int(k / 4)][int(k % 4)] = n
+            mtr[int(k / self.grid_n)][int(k % self.grid_n)] = n
 
 if __name__ == '__main__':
     gameEnv = Game2048()
