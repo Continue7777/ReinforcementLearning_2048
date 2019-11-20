@@ -59,9 +59,9 @@ class Game2048:
             if self.score > self.max_score:
                 self.max_score = self.score
                 self.max_matrix = self.matrix
-            return copy.deepcopy(self.matrix),cur_score, True,
+            return copy.deepcopy(self.matrix),-1000, True,
         else:
-            return copy.deepcopy(self.matrix), -1000, False
+            return copy.deepcopy(self.matrix), cur_score, False
 
     def display(self, mtr=None, n=4):
         def T(a):
