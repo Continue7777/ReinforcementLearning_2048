@@ -59,7 +59,7 @@ class Game2048:
             if self.score > self.max_score:
                 self.max_score = self.score
                 self.max_matrix = self.matrix
-            return copy.deepcopy(self.matrix),0, True,
+            return copy.deepcopy(self.matrix),cur_score, True,
         else:
             return copy.deepcopy(self.matrix), cur_score, False
 
