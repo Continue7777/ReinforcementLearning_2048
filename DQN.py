@@ -57,7 +57,7 @@ class DQN:
 
 
     def _greedy_e(self,seq,probabilities):
-        e = max(0.9 ** (self.step / 1000),0.1)
+        e = 0.6 ** (self.step / 1000)
         res = seq[np.argmax(probabilities)]
         if random.random() < e:
             res = random.choice(seq)
