@@ -102,7 +102,7 @@ class DQN:
         y = []
         for i in range(self.batch_size):
             if done[i] == True:
-                y.append(-1000)
+                y.append(0)
             else:
                 y.append(reward[i] + self.sigema * maxQNext[i])
 
