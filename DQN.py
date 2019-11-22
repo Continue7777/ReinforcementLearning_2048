@@ -8,13 +8,14 @@ from GameEnv import Game2048
 
 
 class DQN:
-    def __init__(self,learning_rate=0.01,batch_size=1000): #初始化
+    def __init__(self,learning_rate=0.01,grid_n = 4,batch_size=1000): #初始化
         self.learning_rate = learning_rate
         self.batch_size = batch_size
         self.sigema = 0.05
         self.step = 0
         self.explore_alpha = 0.9 ** (self.step / 1000)
 
+        self.grid_n = grid_n
         self.actions_index_dicts = {"a":0,"s":1,"w":2,"d":3}
         self.actions_index_dicts_reverse = {0:"a",1:"s",2:"w",3:"d"}
         self.actions_index_keys = ["a","s","w","d"]
@@ -30,11 +31,11 @@ class DQN:
     def build_network(self): #构建网络模型，简单先搞个DNN
 
         self.global_steps = tf.Variable(0, trainable=False)
-        self.matrixInput = tf.placeholder(shape=[None,4,4],dtype=tf.float32,name="matrixInput")
+        self.matrixInput = tf.placeholder(shape=[None,self.grid_n,self.grid_n],dtype=tf.float32,name="matrixInput")
         self.actionInput = tf.placeholder(shape=[None,len(self.actions_index_dicts)],dtype=tf.float32,name="actionInput")
         self.yInput = tf.placeholder(shape=[None,],dtype=tf.float32,name="yInput")
 
-        matrixFlat = tf.reshape(self.matrixInput,shape=[-1,16])
+        matrixFlat = tf.reshape(self.matrixInput,shape=[-1,self.grid_n ** 2])
         layer1 = tf.layers.dense(matrixFlat, 128, activation=tf.nn.leaky_relu)
         layer2 = tf.layers.dense(layer1, 64, activation=tf.nn.leaky_relu)
         self.predictions = tf.layers.dense(layer2,4)
