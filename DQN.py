@@ -8,10 +8,10 @@ from GameEnv import Game2048
 
 
 class DQN:
-    def __init__(self,learning_rate=0.01,grid_n = 4,batch_size=1000): #初始化
+    def __init__(self,learning_rate=0.01,sigma = 1,grid_n = 4,batch_size=1000): #初始化
         self.learning_rate = learning_rate
         self.batch_size = batch_size
-        self.sigema = 0.05
+        self.sigma = sigma
         self.step = 0
         self.explore_alpha = 0.9 ** (self.step / 1000)
 
@@ -104,7 +104,7 @@ class DQN:
             if done[i] == True:
                 y.append(0)
             else:
-                y.append(reward[i] + self.sigema * maxQNext[i])
+                y.append(reward[i] + self.sigma * maxQNext[i])
 
         feed_dict = {self.matrixInput: np.array(status), self.actionInput: np.array(action),self.yInput: np.array(y)}
         _, global_step,loss = self.sess.run([self.train_op, self.global_steps, self.loss], feed_dict=feed_dict)
