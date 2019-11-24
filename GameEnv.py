@@ -35,8 +35,14 @@ class Game2048:
 
     def step(self, action, show=False):
         """
-        step:take the action and return status,reward,done,next_status
+          step:take the action and return status,reward,done,next_status
         """
+        if self.is_over(self.matrix):
+            if self.score > self.max_score:
+                self.max_score = self.score
+                self.max_matrix = self.matrix
+            return copy.deepcopy(self.matrix),0, True
+
         if action == "a":
             dirct = 0
         elif action == "s":
@@ -55,13 +61,8 @@ class Game2048:
             self.update(self.matrix)  # 更新
             if show: self.display(self.matrix)
             self.step_num += 1  # 步数加1
-        if self.is_over(self.matrix):
-            if self.score > self.max_score:
-                self.max_score = self.score
-                self.max_matrix = self.matrix
-            return copy.deepcopy(self.matrix),cur_score, True,
-        else:
-            return copy.deepcopy(self.matrix), cur_score, False
+
+        return copy.deepcopy(self.matrix), cur_score, False
 
     def display(self, mtr=None):
         def T(a):
