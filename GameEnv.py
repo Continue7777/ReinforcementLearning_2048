@@ -9,34 +9,45 @@
 from __future__ import print_function
 import random
 import copy
-
+import numpy as np
 
 
 class Game2048:
-    def __init__(self,grid_n=4):
+    def __init__(self,grid_n=4,reward_type="score_empty_higher"):
         self.score = 0
         self.step_num = 0
         self.episode = 0
         self.max_score = 0
         self.max_matrix = [[]]
 
+        self.reward_type = reward_type #score_update  score_update + empty_update + get_higher_max
         self.grid_n = grid_n
         self.reset()
 
-    def reset(self):
-        mtr = [[0 for i in range(self.grid_n)] for j in range(self.grid_n)]  # 小小蛋疼..
-        ran_pos = random.sample(range(self.grid_n**2), 2)
-        mtr[int(ran_pos[0] / self.grid_n)][int(ran_pos[0] % self.grid_n)] = mtr[int(ran_pos[1] / self.grid_n)][int(ran_pos[1] % self.grid_n)] = 2
+    def reset(self,matrix=None):
+        if matrix is None:
+            mtr = [[0 for i in range(self.grid_n)] for j in range(self.grid_n)]  # 小小蛋疼..
+            ran_pos = random.sample(range(self.grid_n**2), 2)
+            mtr[int(ran_pos[0] / self.grid_n)][int(ran_pos[0] % self.grid_n)] = mtr[int(ran_pos[1] / self.grid_n)][int(ran_pos[1] % self.grid_n)] = 2
+            self.matrix = mtr
+        else:
+            self.matrix = matrix
 
-        self.matrix = mtr
+
         self.step_num = 0
         self.score = 0
         self.episode += 1
 
     def step(self, action, show=False):
         """
-        step:take the action and return status,reward,done,next_status
+          step:take the action and return status,reward,done,next_status
         """
+        if self.is_over(self.matrix):
+            if self.score > self.max_score:
+                self.max_score = self.score
+                self.max_matrix = self.matrix
+            return copy.deepcopy(self.matrix),0, True
+
         if action == "a":
             dirct = 0
         elif action == "s":
@@ -55,13 +66,23 @@ class Game2048:
             self.update(self.matrix)  # 更新
             if show: self.display(self.matrix)
             self.step_num += 1  # 步数加1
-        if self.is_over(self.matrix):
-            if self.score > self.max_score:
-                self.max_score = self.score
-                self.max_matrix = self.matrix
-            return copy.deepcopy(self.matrix),cur_score, True,
+            
+            score_update = np.log2(cur_score+1) / 10.0
+            empty_update = max(np.sum(np.array(self.matrix) == 0) - np.sum(np.array(tmp) == 0),0) 
+            higher_update = np.log2(np.max(self.matrix)) / 10.0 if np.max(self.matrix) != np.max(tmp) else 0
+            if self.reward_type == "score_empty_higher":
+                score_final = score_update + empty_update + higher_update
+            elif self.reward_type == "score":
+                score_final = score_update
+            elif self.reward_type == "higher":
+                score_final = higher_update
+            elif self.reward_type == "empty_higher":
+                score_final = higher_update + empty_update
+            return copy.deepcopy(self.matrix), score_final, False
+#             return copy.deepcopy(self.matrix), np.sum(np.array(self.matrix) == 0), False
         else:
-            return copy.deepcopy(self.matrix), cur_score, False
+            return copy.deepcopy(self.matrix), 0, False
+#         return copy.deepcopy(self.matrix), cur_score, False
 
     def display(self, mtr=None):
         def T(a):
@@ -86,67 +107,52 @@ class Game2048:
                     return False
         return True
 
+    def move_down(self,mtr):
+        visit = []
+        score = 0
+        for j in range(self.grid_n):
+            for i in range(self.grid_n-1, 0, -1):
+                for k in range(0, i):
+                    if mtr[k + 1][j] == 0:
+                        mtr[k + 1][j] = mtr[k][j]
+                        mtr[k][j] = 0
+                    elif mtr[k + 1][j] == mtr[k][j] and (self.grid_n * (k + 1) + j) not in visit and (self.grid_n * k + j) not in visit:
+                        mtr[k + 1][j] *= 2
+                        mtr[k][j] = 0
+                        score += mtr[k + 1][j]
+                        visit.append(self.grid_n * (k) + j)
+                        visit.append(self.grid_n * (k + 1) + j)
+        return score
+    
+    def move_up(self,mtr):
+        mtr = np.flipud(mtr).tolist()
+        score = self.move_down(mtr)
+        self.matrix = np.flipud(mtr).tolist()
+        return score
+    
+    def move_left(self,mtr):
+        mtr = np.flipud(np.transpose(mtr).tolist())
+        score = self.move_down(mtr)
+        self.matrix = np.transpose(np.flipud(mtr)).tolist()
+        return score
+    
+    def move_right(self,mtr):
+        mtr = np.transpose(np.flipud(mtr)).tolist()
+        score = self.move_down(mtr)
+        self.matrix = np.flipud(np.transpose(mtr)).tolist()
+        return score
+    
     def move(self, mtr, dirct):
         score = 0
         visit = []
         if dirct == 0:  # left
-            for i in range(self.grid_n):
-                for j in range(1, self.grid_n):
-                    for k in range(j, 0, -1):
-                        if mtr[i][k - 1] == 0:
-                            mtr[i][k - 1] = mtr[i][k]
-                            mtr[i][k] = 0
-                        elif mtr[i][k - 1] == mtr[i][k] and self.grid_n * i + k - 1 not in visit and self.grid_n * i + k not in visit:
-                            mtr[i][k - 1] *= 2
-                            mtr[i][k] = 0
-                            score += mtr[i][k - 1]
-                            visit.append(self.grid_n * i + k)
-                            visit.append(self.grid_n * i + k - 1)
-                            # for i in range(4):
-                            #    for j in range(3):
-
+            score += self.move_left(mtr)
         elif dirct == 1:  # down
-            for j in range(self.grid_n):
-                for i in range(self.grid_n-1, 0, -1):
-                    for k in range(0, i):
-                        if mtr[k + 1][j] == 0:
-                            mtr[k + 1][j] = mtr[k][j]
-                            mtr[k][j] = 0
-                        elif mtr[k + 1][j] == mtr[k][j] and (self.grid_n * (k + 1) + j) not in visit and (self.grid_n * k + j) not in visit:
-                            mtr[k + 1][j] *= 2
-                            mtr[k][j] = 0
-                            score += mtr[k + 1][j]
-                            visit.append(self.grid_n * (k) + j)
-                            visit.append(self.grid_n * (k + 1) + j)
-
-
+            score += self.move_down(mtr)
         elif dirct == 2:  # up
-            for j in range(self.grid_n):
-                for i in range(1, self.grid_n):
-                    for k in range(i, 0, -1):
-                        if mtr[k - 1][j] == 0:
-                            mtr[k - 1][j] = mtr[k][j]
-                            mtr[k][j] = 0
-                        elif mtr[k - 1][j] == mtr[k][j] and (self.grid_n * (k - 1) + j) not in visit and (self.grid_n * k + j) not in visit:
-                            mtr[k - 1][j] *= 2
-                            mtr[k][j] = 0
-                            score += mtr[k - 1][j]
-                            visit.append(self.grid_n * (k) + j)
-                            visit.append(self.grid_n * (k - 1) + j)
-
+            score += self.move_up(mtr)
         elif dirct == 3:  # right
-            for i in range(self.grid_n):
-                for j in range(self.grid_n-1, 0, -1):
-                    for k in range(j):
-                        if mtr[i][k + 1] == 0:
-                            mtr[i][k + 1] = mtr[i][k]
-                            mtr[i][k] = 0
-                        elif mtr[i][k] == mtr[i][k + 1] and self.grid_n * i + k + 1 not in visit and self.grid_n * i + k not in visit:
-                            mtr[i][k + 1] *= 2
-                            mtr[i][k] = 0
-                            score += mtr[i][k + 1]
-                            visit.append(self.grid_n * i + k + 1)
-                            visit.append(self.grid_n * i + k)
+            score += self.move_right(mtr)
 
         return score
 

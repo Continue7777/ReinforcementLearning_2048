@@ -1,0 +1,2 @@
+model_checkpoint_path: "emb_cnn_16w_episode"
+all_model_checkpoint_paths: "emb_cnn_16w_episode"
